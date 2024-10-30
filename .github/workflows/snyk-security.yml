@@ -29,11 +29,15 @@ jobs:
           . venv/bin/activate
           pip install --upgrade pip
 
+      - name: Install Snyk CLI
+        run: |
+          curl -Lo snyk https://static.snyk.io/cli/v1.108.0/snyk-linux
+          chmod +x snyk
+          mv snyk /usr/local/bin/
+
       - name: Run Snyk Code Test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          . venv/bin/activate
-          pip install snyk==1.108.0
           snyk auth $SNYK_TOKEN
           snyk test
