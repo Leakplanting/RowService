@@ -24,10 +24,16 @@ jobs:
           . venv/bin/activate
           pip install flask
 
+      - name: Upgrade pip
+        run: |
+          . venv/bin/activate
+          pip install --upgrade pip
+
       - name: Run Snyk Code Test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          pip install snyk
+          . venv/bin/activate
+          pip install snyk==1.108.0
           snyk auth $SNYK_TOKEN
           snyk test
