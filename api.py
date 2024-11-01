@@ -31,4 +31,4 @@ def get_all_fields():
     return jsonify(fields_list)
 
 if __name__ == "__main__":
-    app.run(host=HOST, port=PORT)
+    app.run(host=HOST, port=PORT, debug=True)
