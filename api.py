@@ -6,17 +6,15 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-mongodb_password = os.getenv("MONGODB_PASSWORD")
+mongodb_conn = os.getenv("MONGODB_CONN")
 app = Flask(__name__)
 CORS(app)
 # Configuratie voor MongoDB
-import os
 # Retrieves the hostname/IP address from the "HOST" environment variable.
 HOST = os.getenv("HOST", "0.0.0.0")
 # Retrieves the port number from the "PORT" environment variable, defaults to 5000 if not set.
 PORT = int(os.getenv("PORT", 5000))
-CONN = f"mongodb+srv://jmanders07:{mongodb_password}@cluster0.9rwq0.mongodb.net/Leakplanting?retryWrites=true&w=majority&appName=AtlasApp"
-mongo = PyMongo(app, CONN, tlsAllowInvalidCertificates=True)
+mongo = PyMongo(app, mongodb_conn, tlsAllowInvalidCertificates=True)
 
 @app.route('/fields', methods=['GET'])
 def get_all_fields():
