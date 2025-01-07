@@ -13,7 +13,7 @@ CORS(app)
 # Retrieves the hostname/IP address from the "HOST" environment variable.
 HOST = os.getenv("HOST", "0.0.0.0")
 # Retrieves the port number from the "PORT" environment variable, defaults to 5000 if not set.
-PORT = int(os.getenv("PORT", 5000))
+PORT = int(os.getenv("PORT", 5001))
 mongo = PyMongo(app, mongodb_conn, tlsAllowInvalidCertificates=True)
 
 @app.route('/fields', methods=['GET'])
