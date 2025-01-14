@@ -19,10 +19,7 @@ spec:
         - containerPort: 5001
         env:
         - name: MONGODB_CONN
-          valueFrom:
-            secretKeyRef:
-              name: row-service-secrets
-              key: mongodb-conn
+          value: "MONGODB_CONN_PLACEHOLDER"  # This will be replaced by GitHub Actions
         resources:
           requests:
             memory: "128Mi"
