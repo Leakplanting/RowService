@@ -28,9 +28,10 @@ mongodb_uri = os.getenv("MONGODB_CONN")
 if not mongodb_uri:
     raise ValueError("MONGODB_CONN environment variable is not set")
 
-# Create MongoDB client
-client = MongoClient(mongodb_uri, tls=True, tlsAllowInvalidCertificates=True)
-db = client.get_default_database()
+# Create MongoDB client - use the connection string as is
+client = MongoClient(mongodb_uri)
+# Get the database name from the connection string
+db = client.Leakplanting
 
 @app.route('/fields', methods=['GET'])
 def get_all_fields():
