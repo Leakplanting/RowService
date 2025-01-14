@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: row-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: row-service
+  template:
+    metadata:
+      labels:
+        app: row-service
+    spec:
+      containers:
+      - name: row-service
+        image: leakplantingregistry.azurecr.io/row-service:latest  # This will be replaced by GitHub Actions
+        ports:
+        - containerPort: 5001
+        env:
+        - name: MONGODB_CONN
+          valueFrom:
+            secretKeyRef:
+              name: row-service-secrets
+              key: mongodb-conn
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"

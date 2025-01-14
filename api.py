@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_pymongo import PyMongo
 from flask_cors import CORS
-import pika
+# import pika
 import json
 import os
 from dotenv import load_dotenv
