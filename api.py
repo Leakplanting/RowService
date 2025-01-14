@@ -47,7 +47,7 @@ sanitized_uri = sanitize_mongodb_uri(mongodb_uri)
 client = MongoClient(sanitized_uri)
 db = client.Leakplanting
 
-@app.route('/api/fields', methods=['GET'])
+@app.route('/fields', methods=['GET'])
 def get_all_fields():
     fields = db.Fields.find()
     fields_list = []
