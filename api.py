@@ -7,24 +7,23 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-mongodb_conn = os.getenv("MONGODB_CONN")
 app = Flask(__name__)
 CORS(app)
 
 HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", 5001))
-mongo = PyMongo(app, mongodb_conn, tlsAllowInvalidCertificates=True)
 
 # RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
-
 # def send_message_to_rabbitmq(message):
-#     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
-#     channel = connection.channel()
+#     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
+#     channel = connection.channel()
+#     channel.queue_declare(queue='notifications')
+#     channel.basic_publish(exchange='', routing_key='notifications', body=json.dumps(message))
+#     connection.close()
+# Configure MongoDB
 
-#     channel.queue_declare(queue='notifications')
-
-#     channel.basic_publish(exchange='', routing_key='notifications', body=json.dumps(message))
-#     connection.close()
+app.config["MONGO_URI"] = os.getenv("MONGODB_CONN")
+mongo = PyMongo(app)
 
 @app.route('/fields', methods=['GET'])
 def get_all_fields():
