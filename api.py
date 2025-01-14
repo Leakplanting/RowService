@@ -1,10 +1,11 @@
 from flask import Flask, jsonify
-from flask_pymongo import PyMongo
 from flask_cors import CORS
-# import pika
 import json
 import os
 from dotenv import load_dotenv
+from pymongo import MongoClient
+# import pika
+import os
 from urllib.parse import quote_plus
 
 load_dotenv()
@@ -24,21 +25,16 @@ PORT = int(os.getenv("PORT", 5001))
 
 # Configure MongoDB
 mongodb_uri = os.getenv("MONGODB_CONN")
-if mongodb_uri:
-    # Ensure the URI has the correct format
-    if "?" in mongodb_uri:
-        base_uri, options = mongodb_uri.split("?", 1)
-        app.config["MONGO_URI"] = f"{base_uri}?tls=true&tlsAllowInvalidCertificates=true&{options}"
-    else:
-        app.config["MONGO_URI"] = f"{mongodb_uri}?tls=true&tlsAllowInvalidCertificates=true"
-else:
+if not mongodb_uri:
     raise ValueError("MONGODB_CONN environment variable is not set")
 
-mongo = PyMongo(app)
+# Create MongoDB client
+client = MongoClient(mongodb_uri, tls=True, tlsAllowInvalidCertificates=True)
+db = client.get_default_database()
 
 @app.route('/fields', methods=['GET'])
 def get_all_fields():
-    fields = mongo.db.Fields.find()
+    fields = db.Fields.find()
     fields_list = []
 
     for field in fields:
