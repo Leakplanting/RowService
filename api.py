@@ -5,6 +5,7 @@ from flask_cors import CORS
 import json
 import os
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
 load_dotenv()
 app = Flask(__name__)
@@ -15,14 +16,24 @@ PORT = int(os.getenv("PORT", 5001))
 
 # RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
 # def send_message_to_rabbitmq(message):
-#     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
-#     channel = connection.channel()
-#     channel.queue_declare(queue='notifications')
-#     channel.basic_publish(exchange='', routing_key='notifications', body=json.dumps(message))
-#     connection.close()
-# Configure MongoDB
+#     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
+#     channel = connection.channel()
+#     channel.queue_declare(queue='notifications')
+#     channel.basic_publish(exchange='', routing_key='notifications', body=json.dumps(message))
+#     connection.close()
 
-app.config["MONGO_URI"] = os.getenv("MONGODB_CONN")
+# Configure MongoDB
+mongodb_uri = os.getenv("MONGODB_CONN")
+if mongodb_uri:
+    # Ensure the URI has the correct format
+    if "?" in mongodb_uri:
+        base_uri, options = mongodb_uri.split("?", 1)
+        app.config["MONGO_URI"] = f"{base_uri}?tls=true&tlsAllowInvalidCertificates=true&{options}"
+    else:
+        app.config["MONGO_URI"] = f"{mongodb_uri}?tls=true&tlsAllowInvalidCertificates=true"
+else:
+    raise ValueError("MONGODB_CONN environment variable is not set")
+
 mongo = PyMongo(app)
 
 @app.route('/fields', methods=['GET'])
@@ -38,15 +49,6 @@ def get_all_fields():
             'fieldname': field['FieldName'],
         }
         fields_list.append(field_data)
-
-        # if len(field_data['rows']) < 10:
-        #     message = {
-        #         'field_id': field_data['id'],
-        #         'fieldname': field_data['fieldname'],
-        #         'fieldnumber': field_data['fieldnumber'],
-        #         'row_count': len(field_data['rows']),
-        #     }
-        #     send_message_to_rabbitmq(message)
 
     return jsonify(fields_list)
 
