@@ -3,11 +3,13 @@ kind: Service
 metadata:
   name: row-service
   namespace: leakplanting
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "false"
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - port: 80
     targetPort: 5001
-    nodePort: 30001  # This will expose the service on port 30001 on all nodes
+    protocol: TCP
   selector:
     app: row-service
