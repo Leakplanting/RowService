@@ -20,6 +20,14 @@ spec:
         env:
         - name: MONGODB_CONN
           value: "MONGODB_CONN_PLACEHOLDER"  # This will be replaced by GitHub Actions
+        - name: HOST
+          value: "0.0.0.0"
+        - name: PORT
+          value: "5001"
+        - name: FLASK_APP
+          value: "api.py"
+        - name: FLASK_ENV
+          value: "production"
         resources:
           requests:
             memory: "128Mi"

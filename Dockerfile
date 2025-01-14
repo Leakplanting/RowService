@@ -5,7 +5,9 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     FLASK_APP=api.py \
-    FLASK_ENV=production
+    FLASK_ENV=production \
+    HOST=0.0.0.0 \
+    PORT=5001
 
 # Set working directory in the container
 WORKDIR /app
@@ -28,5 +30,8 @@ COPY . .
 # Make port 5001 available
 EXPOSE 5001
 
+# Run the application with gunicorn
+RUN pip install gunicorn
+
 # Run the application
-CMD ["python", "api.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5001", "api:app"]
