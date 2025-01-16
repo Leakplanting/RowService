@@ -67,50 +67,56 @@ def test_get_all_fields(client, monkeypatch):
     assert data[1]['fieldnumber'] == mock_fields[1]['Fieldnumber']
     assert data[1]['fieldname'] == mock_fields[1]['FieldName']
 
-def test_mongodb_sanitization(client, monkeypatch):
-    # Malicious input that could potentially cause injection or XSS
-    malicious_inputs = [
+def test_mongodb_uri_sanitization():
+    # Test cases for different MongoDB connection strings
+    test_cases = [
+        # Basic URI
         {
-            '_id': ObjectId('65a5307c1234567890abcdef'),
-            'Rows': '<script>alert("XSS")</script>',
-            'Fieldnumber': '1; DROP TABLE Fields;--',
-            'FieldName': '{"$gt": ""}'  # Potential NoSQL injection
+            'input': 'mongodb://username:password@cluster.mongodb.net/database',
+            'expected_params': {
+                'retryWrites': 'true',
+                'w': 'majority',
+                'tls': 'true'
+            },
+            'expected_netloc': 'username:password@cluster.mongodb.net'
+        },
+        # URI with existing parameters
+        {
+            'input': 'mongodb://username:password@cluster.mongodb.net/database?ssl=true&authSource=admin',
+            'expected_params': {
+                'retryWrites': 'true',
+                'w': 'majority',
+                'tls': 'true',
+                'ssl': 'true',
+                'authSource': 'admin'
+            },
+            'expected_netloc': 'username:password@cluster.mongodb.net'
         }
     ]
 
-    # Create a mock collection
-    mock_collection = MagicMock()
-    mock_collection.find.return_value = malicious_inputs
+    for case in test_cases:
+        # Import the function directly for testing
+        from api import sanitize_mongodb_uri
+        from urllib.parse import urlparse, parse_qs
 
-    # Create a mock db
-    mock_db = MagicMock()
-    mock_db.Fields = mock_collection
+        # Sanitize the URI
+        sanitized_uri = sanitize_mongodb_uri(case['input'])
 
-    # Mock the get_db function
-    def mock_get_db():
-        return mock_db
+        # Parse the sanitized URI
+        parsed_uri = urlparse(sanitized_uri)
+        query_params = parse_qs(parsed_uri.query)
 
-    # Patch the get_db function
-    monkeypatch.setattr('api.get_db', mock_get_db)
+        # Convert query params to single values for easier comparison
+        query_params = {k: v[0] for k, v in query_params.items()}
 
-    # Make request to the endpoint
-    response = client.get('/fields')
-    
-    # Check response status code
-    assert response.status_code == 200
-    
-    # Parse response data
-    data = json.loads(response.data)
-    
-    # Verify the structure of the response
-    assert isinstance(data, list)
-    assert len(data) == 1
-    
-    # Check the field contents
-    field = data[0]
-    assert field['id'] == '65a5307c1234567890abcdef'
-    assert field['rows'] == '<script>alert("XSS")</script>'
-    assert field['fieldnumber'] == '1; DROP TABLE Fields;--'
-    assert field['fieldname'] == '{"$gt": ""}'
+        # Check that the base URI remains the same
+        assert parsed_uri.scheme == 'mongodb'
+        assert parsed_uri.netloc == case['expected_netloc']
+        assert parsed_uri.path == '/database'
+
+        # Check that expected parameters are present
+        for key, value in case['expected_params'].items():
+            assert key in query_params
+            assert query_params[key] == value
 
 #$ python3 -m pytest tests/test_integration.py -v to run test
