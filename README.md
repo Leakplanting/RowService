@@ -1,5 +1,5 @@
 # RowService
-
+[![codecov](https://codecov.io/gh/Leakplanting/RowService/graph/badge.svg?token=RIO97WJHBP)](https://codecov.io/gh/Leakplanting/RowService)
 A Flask-based microservice for managing row data.
 
 ## Local Development
