@@ -1,5 +1,5 @@
 # RowService
-![Backend tests]https://github.com/Leakplanting/RowService/blob/main/.github/workflows/test.yml/badge.svg
+[![Backend tests]https://github.com/Leakplanting/RowService/blob/main/.github/workflows/test.yml/badge.svg
 [![codecov](https://codecov.io/gh/Leakplanting/RowService/graph/badge.svg?token=RIO97WJHBP)](https://codecov.io/gh/Leakplanting/RowService)
 A Flask-based microservice for managing row data.
 
