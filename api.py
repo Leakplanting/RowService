@@ -13,6 +13,16 @@ CORS(app)
 HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", 5001))
 
+def get_db():
+    mongodb_uri = os.getenv("MONGODB_CONN")
+    if not mongodb_uri:
+        raise ValueError("MONGODB_CONN environment variable is not set")
+    
+    # Sanitize and use the MongoDB URI
+    sanitized_uri = sanitize_mongodb_uri(mongodb_uri)
+    client = MongoClient(sanitized_uri)
+    return client.Leakplanting
+
 def sanitize_mongodb_uri(uri):
     # Parse the URI into components
     parsed = urlparse(uri)
@@ -37,18 +47,9 @@ def sanitize_mongodb_uri(uri):
     query_string = urlencode(params)
     return f"{base_uri}?{query_string}"
 
-# Configure MongoDB
-mongodb_uri = os.getenv("MONGODB_CONN")
-if not mongodb_uri:
-    raise ValueError("MONGODB_CONN environment variable is not set")
-
-# Sanitize and use the MongoDB URI
-sanitized_uri = sanitize_mongodb_uri(mongodb_uri)
-client = MongoClient(sanitized_uri)
-db = client.Leakplanting
-
 @app.route('/fields', methods=['GET'])
 def get_all_fields():
+    db = get_db()
     fields = db.Fields.find()
     fields_list = []
 

@@ -35,8 +35,12 @@ def test_get_all_fields(client, monkeypatch):
     mock_db = MagicMock()
     mock_db.Fields = mock_collection
 
-    # Patch the db object in the api module
-    monkeypatch.setattr('api.db', mock_db)
+    # Mock the get_db function
+    def mock_get_db():
+        return mock_db
+
+    # Patch the get_db function
+    monkeypatch.setattr('api.get_db', mock_get_db)
 
     # Make request to the endpoint
     response = client.get('/fields')
